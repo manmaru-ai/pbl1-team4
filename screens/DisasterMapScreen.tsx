@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -8,8 +8,12 @@ import { parseShelterData, type Shelter } from '../utils/shelterUtils';
 export default function DisasterMapScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [shelters, setShelters] = useState<Shelter[]>([]);
-  const [isFilterVisible, setIsFilterVisible] = useState(false);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>(['all']);
+  const [region, setRegion] = useState({
+    latitude: 34.7666,
+    longitude: 135.6281,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
 
   useEffect(() => {
     loadInitialData();
@@ -21,6 +25,12 @@ export default function DisasterMapScreen() {
       if (status === 'granted') {
         const location = await Location.getCurrentPositionAsync({});
         setLocation(location);
+        setRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        });
       }
 
       const shelterData = parseShelterData();
@@ -40,16 +50,10 @@ export default function DisasterMapScreen() {
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        initialRegion={{
-          latitude: 34.7666,
-          longitude: 135.6281,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
+        region={region}
         showsUserLocation={true}
         showsMyLocationButton={true}
         showsCompass={true}
-        loadingEnabled={true}
       >
         {shelters.map(shelter => (
           <Marker
@@ -101,91 +105,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  layerButton: {
-    position: 'absolute',
-    right: 16,
-    top: 16,
-    backgroundColor: '#1a56db',
-    padding: 12,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  filterModal: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  filterContent: {
-    backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-  },
-  filterHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  filterTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#111827',
-  },
-  filterItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-  },
-  filterItemContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  filterItemText: {
-    fontSize: 16,
-    color: '#374151',
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: '#d1d5db',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxSelected: {
-    backgroundColor: '#1a56db',
-    borderColor: '#1a56db',
-  },
-  callout: {
-    padding: 8,
-    maxWidth: 200,
-  },
-  calloutTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  calloutDescription: {
-    fontSize: 12,
-    color: '#374151',
-    marginBottom: 4,
-  },
-  calloutTypes: {
-    fontSize: 12,
-    color: '#6b7280',
-  },
   legend: {
     position: 'absolute',
     left: 16,
-    bottom: 16,
+    bottom: Platform.OS === 'ios' ? 40 : 16,
     backgroundColor: 'white',
     padding: 12,
     borderRadius: 8,
@@ -214,5 +137,23 @@ const styles = StyleSheet.create({
   legendText: {
     fontSize: 12,
     color: '#374151',
+  },
+  callout: {
+    padding: 8,
+    maxWidth: 200,
+  },
+  calloutTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  calloutDescription: {
+    fontSize: 12,
+    color: '#374151',
+    marginBottom: 4,
+  },
+  calloutTypes: {
+    fontSize: 12,
+    color: '#6b7280',
   },
 }); 

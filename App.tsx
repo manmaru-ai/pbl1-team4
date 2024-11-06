@@ -50,7 +50,7 @@ function HomeScreen({ navigation }: { navigation: NativeStackNavigationProp<Root
           <TouchableOpacity onPress={() => setIsMenuVisible(true)}>
             <Ionicons name="menu" size={24} color="white" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>寝屋川市防災</Text>
+          <Text style={styles.headerTitle}>緊急避難サポート</Text>
           <TouchableOpacity onPress={() => setIsNotificationsVisible(true)}>
             <Ionicons name="notifications" size={24} color="white" />
           </TouchableOpacity>
