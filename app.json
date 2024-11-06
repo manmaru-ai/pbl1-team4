@@ -12,13 +12,19 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.neyagawa.disasterapp",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "このアプリは、近くの避難所や災害情報を表示するために位置情報を使用します。",
+        "NSLocationAlwaysUsageDescription": "このアプリは、バックグラウンドでも災害警報を提供するために位置情報を使用します。"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.neyagawa.disasterapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"

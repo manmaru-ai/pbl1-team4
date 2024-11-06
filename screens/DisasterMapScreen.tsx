@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, Platform } from 'react-native';
+import MapView, { Marker, Callout } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 
@@ -116,7 +116,6 @@ export default function DisasterMapScreen() {
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        provider={PROVIDER_GOOGLE}
         initialRegion={{
           latitude: 34.7666,
           longitude: 135.6281,
@@ -124,6 +123,9 @@ export default function DisasterMapScreen() {
           longitudeDelta: 0.0421,
         }}
         showsUserLocation={true}
+        showsMyLocationButton={true}
+        showsCompass={true}
+        loadingEnabled={true}
       >
         {disasterPoints
           .filter(point => selectedLayer.includes(point.type))
@@ -162,6 +164,8 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+    width: '100%',
+    height: '100%',
   },
   layerButton: {
     position: 'absolute',
