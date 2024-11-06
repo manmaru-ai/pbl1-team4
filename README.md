@@ -40,7 +40,7 @@
 ## インストール手順
 1. リポジトリをクローンします。
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/manmaru-ai/pbl1-team4.git
    ```
 2. プロジェクトディレクトリに移動します。
    ```bash
