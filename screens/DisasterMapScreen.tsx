@@ -3,114 +3,38 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, Platform } from 'react
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
-
-type DisasterPoint = {
-  id: string;
-  type: 'flood' | 'landslide' | 'shelter' | 'emergency';
-  title: string;
-  description: string;
-  coordinate: {
-    latitude: number;
-    longitude: number;
-  };
-  severity?: 'high' | 'medium' | 'low';
-};
+import { parseShelterData, type Shelter } from '../utils/shelterUtils';
 
 export default function DisasterMapScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [selectedLayer, setSelectedLayer] = useState<string[]>(['shelter']);
+  const [shelters, setShelters] = useState<Shelter[]>([]);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
-
-  const disasterPoints: DisasterPoint[] = [
-    {
-      id: '1',
-      type: 'flood',
-      title: '浸水警戒区域',
-      description: '水位上昇中 - 警戒レベル3',
-      coordinate: { latitude: 34.7666, longitude: 135.6281 },
-      severity: 'high'
-    },
-    {
-      id: '2',
-      type: 'shelter',
-      title: '寝屋川市民体育館',
-      description: '収容可能人数: 500人\n現在の人数: 120人',
-      coordinate: { latitude: 34.7650, longitude: 135.6270 }
-    },
-    // 他の災害ポイントを追加
-  ];
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(['all']);
 
   useEffect(() => {
-    (async () => {
+    loadInitialData();
+  }, []);
+
+  const loadInitialData = async () => {
+    try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status === 'granted') {
         const location = await Location.getCurrentPositionAsync({});
         setLocation(location);
       }
-    })();
-  }, []);
 
-  const getMarkerColor = (type: string, severity?: string) => {
-    switch (type) {
-      case 'flood': return severity === 'high' ? '#ef4444' : '#f59e0b';
-      case 'landslide': return '#dc2626';
-      case 'shelter': return '#22c55e';
-      case 'emergency': return '#7c3aed';
-      default: return '#3b82f6';
+      const shelterData = parseShelterData();
+      setShelters(shelterData);
+    } catch (error) {
+      console.error('データの読み込みに失敗:', error);
     }
   };
 
-  const LayerFilter = () => (
-    <Modal
-      visible={isFilterVisible}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={() => setIsFilterVisible(false)}
-    >
-      <View style={styles.filterModal}>
-        <View style={styles.filterContent}>
-          <View style={styles.filterHeader}>
-            <Text style={styles.filterTitle}>表示する情報</Text>
-            <TouchableOpacity onPress={() => setIsFilterVisible(false)}>
-              <Ionicons name="close" size={24} color="#111827" />
-            </TouchableOpacity>
-          </View>
-          
-          {[
-            { id: 'shelter', icon: 'home', label: '避難所' },
-            { id: 'flood', icon: 'water', label: '浸水区域' },
-            { id: 'landslide', icon: 'warning', label: '土砂災害' },
-            { id: 'emergency', icon: 'alert-circle', label: '緊急地点' }
-          ].map(item => (
-            <TouchableOpacity
-              key={item.id}
-              style={styles.filterItem}
-              onPress={() => {
-                setSelectedLayer(prev => 
-                  prev.includes(item.id)
-                    ? prev.filter(i => i !== item.id)
-                    : [...prev, item.id]
-                );
-              }}
-            >
-              <View style={styles.filterItemContent}>
-                <Ionicons name={item.icon as any} size={24} color="#374151" />
-                <Text style={styles.filterItemText}>{item.label}</Text>
-              </View>
-              <View style={[
-                styles.checkbox,
-                selectedLayer.includes(item.id) && styles.checkboxSelected
-              ]}>
-                {selectedLayer.includes(item.id) && (
-                  <Ionicons name="checkmark" size={16} color="white" />
-                )}
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-    </Modal>
-  );
+  const getMarkerColor = (types: string[]) => {
+    if (types.includes('津波')) return '#ef4444';
+    if (types.includes('洪水')) return '#f59e0b';
+    return '#22c55e';
+  };
 
   return (
     <View style={styles.container}>
@@ -127,33 +51,43 @@ export default function DisasterMapScreen() {
         showsCompass={true}
         loadingEnabled={true}
       >
-        {disasterPoints
-          .filter(point => selectedLayer.includes(point.type))
-          .map(point => (
-            <Marker
-              key={point.id}
-              coordinate={point.coordinate}
-              pinColor={getMarkerColor(point.type, point.severity)}
-            >
-              <Callout>
-                <View style={styles.callout}>
-                  <Text style={styles.calloutTitle}>{point.title}</Text>
-                  <Text style={styles.calloutDescription}>{point.description}</Text>
-                </View>
-              </Callout>
-            </Marker>
-          ))
-        }
+        {shelters.map(shelter => (
+          <Marker
+            key={shelter.id}
+            coordinate={{
+              latitude: shelter.latitude,
+              longitude: shelter.longitude
+            }}
+            pinColor={getMarkerColor(shelter.types)}
+          >
+            <Callout>
+              <View style={styles.callout}>
+                <Text style={styles.calloutTitle}>{shelter.name}</Text>
+                <Text style={styles.calloutDescription}>{shelter.address}</Text>
+                <Text style={styles.calloutTypes}>
+                  対応災害: {shelter.types.join(', ')}
+                </Text>
+              </View>
+            </Callout>
+          </Marker>
+        ))}
       </MapView>
 
-      <TouchableOpacity
-        style={styles.layerButton}
-        onPress={() => setIsFilterVisible(true)}
-      >
-        <Ionicons name="layers" size={24} color="white" />
-      </TouchableOpacity>
-
-      <LayerFilter />
+      <View style={styles.legend}>
+        <Text style={styles.legendTitle}>避難所の種類</Text>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendColor, { backgroundColor: '#22c55e' }]} />
+          <Text style={styles.legendText}>一般避難所</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendColor, { backgroundColor: '#f59e0b' }]} />
+          <Text style={styles.legendText}>洪水対応</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendColor, { backgroundColor: '#ef4444' }]} />
+          <Text style={styles.legendText}>津波対応</Text>
+        </View>
+      </View>
     </View>
   );
 }
@@ -235,12 +169,50 @@ const styles = StyleSheet.create({
     maxWidth: 200,
   },
   calloutTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   calloutDescription: {
+    fontSize: 12,
+    color: '#374151',
+    marginBottom: 4,
+  },
+  calloutTypes: {
+    fontSize: 12,
+    color: '#6b7280',
+  },
+  legend: {
+    position: 'absolute',
+    left: 16,
+    bottom: 16,
+    backgroundColor: 'white',
+    padding: 12,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  legendTitle: {
     fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 4,
+  },
+  legendColor: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    marginRight: 8,
+  },
+  legendText: {
+    fontSize: 12,
     color: '#374151',
   },
 }); 

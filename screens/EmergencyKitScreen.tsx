@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -10,6 +10,7 @@ import {
   Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type EmergencyItem = {
   id: string;
@@ -21,32 +22,7 @@ type EmergencyItem = {
 };
 
 export default function EmergencyKitScreen() {
-  const [items, setItems] = useState<EmergencyItem[]>([
-    {
-      id: '1',
-      name: '飲料水',
-      quantity: 6,
-      expiryDate: '2024-12-31',
-      category: 'food',
-      isChecked: true,
-    },
-    {
-      id: '2',
-      name: '非常食',
-      quantity: 3,
-      expiryDate: '2024-10-31',
-      category: 'food',
-      isChecked: true,
-    },
-    {
-      id: '3',
-      name: '救急箱',
-      quantity: 1,
-      expiryDate: '2025-06-30',
-      category: 'medical',
-      isChecked: true,
-    },
-  ]);
+  const [items, setItems] = useState<EmergencyItem[]>([]);
 
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [newItem, setNewItem] = useState({
@@ -56,6 +32,29 @@ export default function EmergencyKitScreen() {
     category: 'other' as EmergencyItem['category'],
   });
 
+  useEffect(() => {
+    loadItems();
+  }, []);
+
+  const loadItems = async () => {
+    try {
+      const savedItems = await AsyncStorage.getItem('emergencyItems');
+      if (savedItems) {
+        setItems(JSON.parse(savedItems));
+      }
+    } catch (error) {
+      console.error('アイテムの読み込みに失敗しました:', error);
+    }
+  };
+
+  const saveItems = async (newItems: EmergencyItem[]) => {
+    try {
+      await AsyncStorage.setItem('emergencyItems', JSON.stringify(newItems));
+    } catch (error) {
+      console.error('アイテムの保存に失敗しました:', error);
+    }
+  };
+
   const handleAddItem = () => {
     if (!newItem.name.trim()) {
       Alert.alert('エラー', 'アイテム名を入力してください');
@@ -63,14 +62,17 @@ export default function EmergencyKitScreen() {
     }
 
     const newId = Date.now().toString();
-    setItems(prev => [...prev, {
+    const updatedItems = [...items, {
       id: newId,
       name: newItem.name,
       quantity: parseInt(newItem.quantity) || 1,
       expiryDate: newItem.expiryDate,
       category: newItem.category,
       isChecked: true,
-    }]);
+    }];
+
+    setItems(updatedItems);
+    saveItems(updatedItems);
 
     setNewItem({
       name: '',
@@ -82,9 +84,11 @@ export default function EmergencyKitScreen() {
   };
 
   const toggleItemCheck = (id: string) => {
-    setItems(prev => prev.map(item => 
+    const updatedItems = items.map(item => 
       item.id === id ? { ...item, isChecked: !item.isChecked } : item
-    ));
+    );
+    setItems(updatedItems);
+    saveItems(updatedItems);
   };
 
   const deleteItem = (id: string) => {
@@ -96,7 +100,11 @@ export default function EmergencyKitScreen() {
         { 
           text: '削除',
           style: 'destructive',
-          onPress: () => setItems(prev => prev.filter(item => item.id !== id))
+          onPress: () => {
+            const updatedItems = items.filter(item => item.id !== id);
+            setItems(updatedItems);
+            saveItems(updatedItems);
+          }
         }
       ]
     );

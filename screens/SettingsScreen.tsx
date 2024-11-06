@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSettings } from '../contexts/SettingsContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SettingsScreen() {
-  const [notifications, setNotifications] = useState(true);
-  const [locationServices, setLocationServices] = useState(true);
-  const [offlineMode, setOfflineMode] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const {
+    notifications,
+    locationServices,
+    offlineMode,
+    setNotifications,
+    setLocationServices,
+    setOfflineMode,
+  } = useSettings();
 
   const handleDataClear = () => {
     Alert.alert(
@@ -19,7 +25,14 @@ export default function SettingsScreen() {
         },
         {
           text: '削除',
-          onPress: () => Alert.alert('完了', 'すべてのデータが削除されました'),
+          onPress: async () => {
+            try {
+              await AsyncStorage.clear();
+              Alert.alert('完了', 'すべてのデータが削除されました');
+            } catch (error) {
+              Alert.alert('エラー', 'データの削除に失敗しました');
+            }
+          },
           style: 'destructive'
         }
       ]
@@ -68,18 +81,6 @@ export default function SettingsScreen() {
             onValueChange={setOfflineMode}
             trackColor={{ false: '#d1d5db', true: '#93c5fd' }}
             thumbColor={offlineMode ? '#1a56db' : '#f3f4f6'}
-          />
-        </View>
-        <View style={styles.settingItem}>
-          <View style={styles.settingContent}>
-            <Ionicons name="moon" size={22} color="#374151" />
-            <Text style={styles.settingText}>ダークモード</Text>
-          </View>
-          <Switch
-            value={darkMode}
-            onValueChange={setDarkMode}
-            trackColor={{ false: '#d1d5db', true: '#93c5fd' }}
-            thumbColor={darkMode ? '#1a56db' : '#f3f4f6'}
           />
         </View>
       </View>

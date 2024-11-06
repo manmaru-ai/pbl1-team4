@@ -10,6 +10,7 @@ import SettingsScreen from './screens/SettingsScreen';
 import AboutScreen from './screens/AboutScreen';
 import DisasterMapScreen from './screens/DisasterMapScreen';
 import EmergencyKitScreen from './screens/EmergencyKitScreen';
+import { SettingsProvider } from './contexts/SettingsContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -157,55 +158,57 @@ function HomeScreen({ navigation }: { navigation: NativeStackNavigationProp<Root
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#1a56db',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        }}
-      >
-        <Stack.Screen 
-          name="Home" 
-          component={HomeScreen} 
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen 
-          name="Shelter" 
-          component={ShelterScreen} 
-          options={{ title: '避難所情報' }}
-        />
-        <Stack.Screen 
-          name="Weather" 
-          component={WeatherScreen} 
-          options={{ title: '天気予報' }}
-        />
-        <Stack.Screen 
-          name="Settings" 
-          component={SettingsScreen} 
-          options={{ title: '設定' }}
-        />
-        <Stack.Screen 
-          name="About" 
-          component={AboutScreen} 
-          options={{ title: 'アプリについて' }}
-        />
-        <Stack.Screen 
-          name="DisasterMap" 
-          component={DisasterMapScreen} 
-          options={{ title: '災害マップ' }}
-        />
-        <Stack.Screen 
-          name="EmergencyKit" 
-          component={EmergencyKitScreen} 
-          options={{ title: '防災グッズ管理' }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <SettingsProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: '#1a56db',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
+        >
+          <Stack.Screen 
+            name="Home" 
+            component={HomeScreen} 
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen 
+            name="Shelter" 
+            component={ShelterScreen} 
+            options={{ title: '避難所情報' }}
+          />
+          <Stack.Screen 
+            name="Weather" 
+            component={WeatherScreen} 
+            options={{ title: '天気予報' }}
+          />
+          <Stack.Screen 
+            name="Settings" 
+            component={SettingsScreen} 
+            options={{ title: '設定' }}
+          />
+          <Stack.Screen 
+            name="About" 
+            component={AboutScreen} 
+            options={{ title: 'アプリについて' }}
+          />
+          <Stack.Screen 
+            name="DisasterMap" 
+            component={DisasterMapScreen} 
+            options={{ title: '災害マップ' }}
+          />
+          <Stack.Screen 
+            name="EmergencyKit" 
+            component={EmergencyKitScreen} 
+            options={{ title: '防災グッズ管理' }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </SettingsProvider>
   );
 }
 

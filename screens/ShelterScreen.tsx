@@ -1,54 +1,79 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { parseShelterData, findNearestShelters, type Shelter } from '../utils/shelterUtils';
 
 export default function ShelterScreen() {
-  const shelters = [
-    {
-      id: 1,
-      name: '東小学校',
-      address: '寝屋川市太秦元町2-1',
-      capacity: '避難所',
-      phone: '072-825-9001',
-      status: '開設準備中',
-    },
-    {
-      id: 2,
-      name: '第一中学校',
-      address: '寝屋川市高宮新町32-1',
-      capacity: '避難所',
-      phone: '072-825-9000',
-      status: '開設準備中',
-    },
-    {
-      id: 3,
-      name: '市民会館',
-      address: '寝屋川市秦町41-1',
-      capacity: '大ホール1,203席、小ホール200人',
-      phone: '072-823-1221',
-      status: '開設中',
-    },
-  ];
+  const [isLoading, setIsLoading] = useState(true);
+  const [nearestShelters, setNearestShelters] = useState<Shelter[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadShelters();
+  }, []);
+
+  const loadShelters = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setError('位置情報へのアクセスが許可されていません');
+        setIsLoading(false);
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({});
+      const shelters = parseShelterData();
+      const nearest = findNearestShelters(location, shelters);
+      setNearestShelters(nearest);
+
+    } catch (err) {
+      setError('避難所情報の読み込みに失敗しました');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color="#1a56db" />
+        <Text style={styles.loadingText}>避難所情報を読み込んでいます...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centerContainer}>
+        <Ionicons name="warning" size={48} color="#dc2626" />
+        <Text style={styles.errorText}>{error}</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={loadShelters}>
+          <Text style={styles.retryButtonText}>再試行</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
-      {/* Offline Notice */}
       <View style={styles.offlineNotice}>
         <Ionicons name="information-circle" size={16} color="#1a56db" />
         <Text style={styles.offlineText}>オフラインでも閲覧可能です</Text>
       </View>
 
-      {/* Shelters List */}
       <View style={styles.sheltersList}>
-        {shelters.map((shelter) => (
+        {nearestShelters.map((shelter) => (
           <View key={shelter.id} style={styles.shelterCard}>
             <View style={styles.shelterHeader}>
               <Text style={styles.shelterName}>{shelter.name}</Text>
-              <View style={[
-                styles.statusBadge,
-                shelter.status === '開設中' ? styles.statusOpen : styles.statusPreparing
-              ]}>
-                <Text style={styles.statusText}>{shelter.status}</Text>
+              <View style={styles.statusBadge}>
+                <Text style={styles.statusText}>最寄り</Text>
               </View>
             </View>
 
@@ -59,18 +84,28 @@ export default function ShelterScreen() {
               </View>
 
               <View style={styles.infoRow}>
-                <Ionicons name="people" size={16} color="#6b7280" />
-                <Text style={styles.infoText}>{shelter.capacity}</Text>
+                <Ionicons name="shield-checkmark" size={16} color="#6b7280" />
+                <Text style={styles.infoText}>
+                  対応災害: {shelter.types.join(', ')}
+                </Text>
               </View>
 
               <View style={styles.infoRow}>
-                <Ionicons name="call" size={16} color="#6b7280" />
-                <Text style={styles.infoText}>{shelter.phone}</Text>
+                <Ionicons name="navigate" size={16} color="#6b7280" />
+                <Text style={styles.infoText}>
+                  現在地からの距離: {shelter.distance ? Math.round(shelter.distance * 10) / 10 : '不明'}km
+                </Text>
               </View>
             </View>
 
-            <TouchableOpacity style={styles.detailsButton}>
-              <Text style={styles.detailsButtonText}>詳細を見る</Text>
+            <TouchableOpacity 
+              style={styles.detailsButton}
+              onPress={() => {
+                const url = `https://www.google.com/maps/dir/?api=1&destination=${shelter.latitude},${shelter.longitude}`;
+                Linking.openURL(url);
+              }}
+            >
+              <Text style={styles.detailsButtonText}>経路を表示</Text>
             </TouchableOpacity>
           </View>
         ))}
@@ -160,6 +195,35 @@ const styles = StyleSheet.create({
   detailsButtonText: {
     color: 'white',
     fontSize: 14,
+    fontWeight: 'bold',
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#374151',
+  },
+  errorText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#dc2626',
+    textAlign: 'center',
+  },
+  retryButton: {
+    marginTop: 16,
+    backgroundColor: '#1a56db',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: 'white',
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });
