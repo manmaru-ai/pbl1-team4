@@ -29,8 +29,8 @@ function HomeScreen({ navigation }: { navigation: NativeStackNavigationProp<Root
   const [isNotificationsVisible, setIsNotificationsVisible] = useState(false);
 
   const emergencyNotices = [
-    { id: 1, time: '2024.04.18 10:15', type: '気象警報・注意報', icon: '⚠️' },
-    { id: 2, time: '2024.04.18 09:30', type: '避難所開設情報', icon: '🏠' },
+    { id: 1, time: '2024.11.06 10:15', type: '気象警報・注意報', icon: '⚠️' },
+    { id: 2, time: '2024.11.05 09:30', type: '避難所開設情報', icon: '🏠' },
   ];
 
   const menuItems = [
@@ -90,7 +90,7 @@ function HomeScreen({ navigation }: { navigation: NativeStackNavigationProp<Root
 
         <View style={styles.offlineStatus}>
           <Ionicons name="refresh" size={16} color="#666" />
-          <Text style={styles.offlineText}>最終更新: 2024年10月20日 16:14</Text>
+          <Text style={styles.offlineText}>最終更新: 2024年11月06日 16:14</Text>
         </View>
       </ScrollView>
 

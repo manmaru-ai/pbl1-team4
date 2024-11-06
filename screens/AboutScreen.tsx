@@ -11,14 +11,14 @@ export default function AboutScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Ionicons name="shield-checkmark" size={64} color="#1a56db" />
-        <Text style={styles.appName}>寝屋川市防災</Text>
+        <Text style={styles.appName}>緊急避難サポート</Text>
         <Text style={styles.version}>バージョン 1.0.0</Text>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>アプリについて</Text>
         <Text style={styles.description}>
-          寝屋川市防災アプリは、市民の皆様の安全を第一に考え、災害時の迅速な情報提供と避難支援を目的として開発されました。
+          緊急避難サポートアプリは、市民の皆様の安全を第一に考え、災害時の迅速な情報提供と避難支援を目的として開発されました。
           気象警報や避難情報をリアルタイムで受け取り、近くの避難所情報を簡単に確認することができます。
         </Text>
       </View>
@@ -58,25 +58,23 @@ export default function AboutScreen() {
         <Text style={styles.sectionTitle}>お問い合わせ</Text>
         <TouchableOpacity 
           style={styles.linkItem}
-          onPress={() => handleLinkPress('https://www.city.neyagawa.osaka.jp/')}
+          onPress={() => handleLinkPress('https://www.osakapublic-u.ac.jp/')}
         >
           <Ionicons name="globe" size={20} color="#1a56db" />
-          <Text style={styles.linkText}>寝屋川市公式ウェブサイト</Text>
+          <Text style={styles.linkText}>大阪公立大学工業高等専門学校公式ウェブサイト</Text>
         </TouchableOpacity>
         <TouchableOpacity 
           style={styles.linkItem}
-          onPress={() => handleLinkPress('mailto:support@neyagawa.example.com')}
+          onPress={() => handleLinkPress('mailto:support@osakapublic-u.ac.jp')}
         >
-          <Ionicons name="mail" size={20} color="#1a56db" />
-          <Text style={styles.linkText}>お問い合わせメール</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.copyright}>© 2024 寝屋川市役所</Text>
+        <Text style={styles.copyright}>© 2024 大阪公立大学工業高等専門学校</Text>
         <TouchableOpacity 
           style={styles.privacyLink}
-          onPress={() => handleLinkPress('https://www.city.neyagawa.osaka.jp/privacy')}
+          onPress={() => handleLinkPress('https://www.osakapublic-u.ac.jp/privacy')}
         >
           <Text style={styles.privacyText}>プライバシーポリシー</Text>
         </TouchableOpacity>
