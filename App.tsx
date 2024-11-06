@@ -28,11 +28,8 @@ function HomeScreen({ navigation }: { navigation: NativeStackNavigationProp<Root
   const [isNotificationsVisible, setIsNotificationsVisible] = useState(false);
 
   const emergencyNotices = [
-    { id: 1, time: '2024.10.20 10:15', type: '気象警報・注意報', icon: '⚠️' },
-    { id: 2, time: '2024.10.19 15:29', type: '気象警報・注意報', icon: '⚠️' },
-    { id: 3, time: '2024.10.18 12:26', type: '避難情報発表中', icon: '⚡' },
-    { id: 4, time: '2024.10.17 14:25', type: '気象警報・注意報', icon: '⚠️' },
-    { id: 5, time: '2024.10.16 14:42', type: '気象警報・注意報', icon: '⚠️' },
+    { id: 1, time: '2024.04.18 10:15', type: '気象警報・注意報', icon: '⚠️' },
+    { id: 2, time: '2024.04.18 09:30', type: '避難所開設情報', icon: '🏠' },
   ];
 
   const menuItems = [

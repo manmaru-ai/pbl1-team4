@@ -6,27 +6,27 @@ export default function ShelterScreen() {
   const shelters = [
     {
       id: 1,
-      name: '寝屋川市立寝屋川小学校',
-      address: '寝屋川市寝屋川公園1-1',
-      capacity: '500人',
-      phone: '072-123-4567',
+      name: '東小学校',
+      address: '寝屋川市太秦元町2-1',
+      capacity: '避難所',
+      phone: '072-825-9001',
       status: '開設準備中',
     },
     {
       id: 2,
-      name: '寝屋川市立第一中学校',
-      address: '寝屋川市八坂町3-4-7',
-      capacity: '300人',
-      phone: '072-123-4568',
-      status: '開設中',
+      name: '第一中学校',
+      address: '寝屋川市高宮新町32-1',
+      capacity: '避難所',
+      phone: '072-825-9000',
+      status: '開設準備中',
     },
     {
       id: 3,
-      name: '寝屋川市立第二中学校',
-      address: '寝屋川市高柳1-1',
-      capacity: '400人',
-      phone: '072-123-4569',
-      status: '開設準備中',
+      name: '市民会館',
+      address: '寝屋川市秦町41-1',
+      capacity: '大ホール1,203席、小ホール200人',
+      phone: '072-823-1221',
+      status: '開設中',
     },
   ];
 
@@ -60,7 +60,7 @@ export default function ShelterScreen() {
 
               <View style={styles.infoRow}>
                 <Ionicons name="people" size={16} color="#6b7280" />
-                <Text style={styles.infoText}>収容可能人数: {shelter.capacity}</Text>
+                <Text style={styles.infoText}>{shelter.capacity}</Text>
               </View>
 
               <View style={styles.infoRow}>
