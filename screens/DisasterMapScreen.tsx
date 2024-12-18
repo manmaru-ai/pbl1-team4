@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
@@ -8,6 +8,7 @@ import { parseShelterData, type Shelter } from '../utils/shelterUtils';
 export default function DisasterMapScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [shelters, setShelters] = useState<Shelter[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [region, setRegion] = useState({
     latitude: 34.7666,
     longitude: 135.6281,
@@ -21,6 +22,7 @@ export default function DisasterMapScreen() {
 
   const loadInitialData = async () => {
     try {
+      setIsLoading(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status === 'granted') {
         const location = await Location.getCurrentPositionAsync({});
@@ -37,6 +39,8 @@ export default function DisasterMapScreen() {
       setShelters(shelterData);
     } catch (error) {
       console.error('データの読み込みに失敗:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -45,6 +49,15 @@ export default function DisasterMapScreen() {
     if (types.includes('洪水')) return '#f59e0b';
     return '#22c55e';
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size={36} color="#1a56db" />
+        <Text style={styles.loadingText}>マップを読み込んでいます...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -155,5 +168,16 @@ const styles = StyleSheet.create({
   calloutTypes: {
     fontSize: 12,
     color: '#6b7280',
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#374151',
   },
 }); 

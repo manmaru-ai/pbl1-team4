@@ -57,3 +57,34 @@
 
 ## 使用方法
 アプリを起動すると、ホーム画面が表示されます。メニューから避難所情報、災害マップ、防災グッズ管理、気象情報などの機能にアクセスできます。
+
+## ExpoSDKのアップデート手順
+
+ExpoSDKのアップデートが必要な場合は、以下の手順で対応してください。
+
+1. package.jsonのexpoとexpo関連パッケージを更新
+   ```bash
+   npx expo-doctor
+   ```
+
+2. 依存関係のアップデート
+   ```bash
+   npx expo install --fix
+   ```
+
+3. プロジェクトのクリーンアップ
+   ```bash
+   npx expo prebuild --clean
+   ```
+
+4. キャッシュのクリア
+   ```bash
+   npx expo start --clear
+   ```
+
+注意点:
+- アップデート前に必ずプロジェクトのバックアップを取ってください
+- 破壊的変更がある可能性があるため、リリースノートを確認してください
+- 依存関係のバージョンの整合性に注意してください
+
+参考: [ExpoSDK50へのアップグレード方法](https://zenn.dev/ryuu/articles/upgrade-exposdk-50)

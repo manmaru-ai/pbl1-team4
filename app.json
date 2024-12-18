@@ -36,6 +36,7 @@
           "locationAlwaysAndWhenInUsePermission": "位置情報へのアクセスを許可しますか？"
         }
       ]
-    ]
+    ],
+    "newArchEnabled": true
   }
 }

@@ -42,7 +42,7 @@ export default function ShelterScreen() {
   if (isLoading) {
     return (
       <View style={styles.centerContainer}>
-        <ActivityIndicator size="large" color="#1a56db" />
+        <ActivityIndicator size={36} color="#1a56db" />
         <Text style={styles.loadingText}>避難所情報を読み込んでいます...</Text>
       </View>
     );
