@@ -87,4 +87,4 @@ ExpoSDKのアップデートが必要な場合は、以下の手順で対応し�
 - 破壊的変更がある可能性があるため、リリースノートを確認してください
 - 依存関係のバージョンの整合性に注意してください
 
-参考: [ExpoSDK50へのアップグレード方法](https://zenn.dev/ryuu/articles/upgrade-exposdk-50)
+こちらの記事を参考にしてください: [ExpoSDK50へのアップグレード方法](https://zenn.dev/ryuu/articles/upgrade-exposdk-50)
