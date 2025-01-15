@@ -74,7 +74,7 @@ export default function AboutScreen() {
         <Text style={styles.copyright}>© 2024 大阪公立大学工業高等専門学校</Text>
         <TouchableOpacity 
           style={styles.privacyLink}
-          onPress={() => handleLinkPress('https://www.osakapublic-u.ac.jp/privacy')}
+          onPress={() => handleLinkPress('https://www.ct.omu.ac.jp/')}
         >
           <Text style={styles.privacyText}>プライバシーポリシー</Text>
         </TouchableOpacity>
