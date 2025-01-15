@@ -58,7 +58,7 @@ export default function AboutScreen() {
         <Text style={styles.sectionTitle}>お問い合わせ</Text>
         <TouchableOpacity 
           style={styles.linkItem}
-          onPress={() => handleLinkPress('https://www.osakapublic-u.ac.jp/')}
+          onPress={() => handleLinkPress('https://www.ct.omu.ac.jp/')}
         >
           <Ionicons name="globe" size={20} color="#1a56db" />
           <Text style={styles.linkText}>大阪公立大学工業高等専門学校公式ウェブサイト</Text>
